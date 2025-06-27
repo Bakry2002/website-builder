@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Menu } from "lucide-react";
 import Image from "next/image";
@@ -194,7 +195,7 @@ function CustomSheet({
     <div
       className={cn(
         "fixed top-0 left-0 w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 h-screen",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        isOpen ? "translate-x-0" : "-translate-x-[120%]"
       )}
     >
       <div className="p-6">{children}</div>
@@ -215,6 +216,7 @@ function HeaderSection({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isMobileLayout = deviceScreen === "tablet" || deviceScreen === "mobile";
+  const isMobile = useIsMobile();
 
   return (
     <header
@@ -235,7 +237,7 @@ function HeaderSection({
           >
             {logo}
           </div>
-          {!isMobileLayout ? (
+          {!isMobileLayout && !isMobile ? (
             <div className="flex space-x-6">
               {navigation.map((item: string, index: number) => (
                 <a
@@ -403,28 +405,54 @@ function GallerySection({
 }) {
   const { title, images } = section.content;
 
+  const getResponsiveGridClasses = () => {
+    const baseResponsive =
+      "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3";
+
+    switch (deviceScreen) {
+      case "mobile":
+        return "grid-cols-1";
+      case "tablet":
+        return "grid-cols-1 sm:grid-cols-2";
+      case "monitor":
+      default:
+        return baseResponsive;
+    }
+  };
+
+  const getResponsiveGapClasses = () => {
+    const baseResponsive = "gap-4 md:gap-6 lg:gap-8";
+
+    switch (deviceScreen) {
+      case "mobile":
+        return "gap-3";
+      case "tablet":
+        return "gap-4 md:gap-6";
+      case "monitor":
+      default:
+        return baseResponsive;
+    }
+  };
+
+  const gridCols = getResponsiveGridClasses();
+  const gap = getResponsiveGapClasses();
+
   const galleryStyles = {
     monitor: {
-      gridCols: "grid-cols-3",
-      gap: "gap-8",
       titleSize: "text-4xl",
       padding: "py-16",
     },
     tablet: {
-      gridCols: "grid-cols-2",
-      gap: "gap-6",
       titleSize: "text-3xl",
       padding: "py-12",
     },
     mobile: {
-      gridCols: "grid-cols-1",
-      gap: "gap-4",
       titleSize: "text-2xl",
       padding: "py-8",
     },
   };
 
-  const { gridCols, gap, titleSize, padding } = galleryStyles[deviceScreen];
+  const { titleSize, padding } = galleryStyles[deviceScreen];
 
   return (
     <div

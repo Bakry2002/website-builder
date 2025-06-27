@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { colorPalettes, fontOptions } from "@/constant";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import { Paintbrush, Sparkles, Zap } from "lucide-react";
 
 interface StyleLibraryProps {
@@ -36,13 +37,14 @@ export function StyleLibrary({
       backgroundColor: palette.background,
     });
   };
+  const isMobile = useIsMobile();
 
   return (
     <Tabs
       defaultValue="basics"
       className="space-y-4 h-full flex flex-col pl-2 pr-4"
     >
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full md:grid-cols-2  grid-cols-1">
         <TabsTrigger
           value="basics"
           className="flex cursor-pointer items-center space-x-2"
@@ -59,7 +61,7 @@ export function StyleLibrary({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="basics">
+      <TabsContent value="basics" className="mt-6">
         <div className="space-y-4">
           <Card className="p-4 gap-3">
             <CardHeader className="p-0">
@@ -177,7 +179,7 @@ export function StyleLibrary({
         </div>
       </TabsContent>
 
-      <TabsContent value="themes">
+      <TabsContent value="themes" className="mt-6">
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
             <Zap className="w-4 h-4 mr-2" />
@@ -191,17 +193,31 @@ export function StyleLibrary({
             >
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
-                  <div className="flex space-x-1">
+                  <div
+                    className={cn(
+                      isMobile ? "flex-col gap-y-2" : "flex-row",
+                      "flex space-x-1"
+                    )}
+                  >
                     <div
-                      className="w-8 h-8 rounded-full shadow-sm"
+                      className={cn(
+                        isMobile ? "w-4 h-4" : "w-8 h-8",
+                        "rounded-full shadow-sm"
+                      )}
                       style={{ backgroundColor: palette.primary }}
                     />
                     <div
-                      className="w-8 h-8 rounded-full shadow-sm"
+                      className={cn(
+                        isMobile ? "w-4 h-4" : "w-8 h-8",
+                        "rounded-full shadow-sm"
+                      )}
                       style={{ backgroundColor: palette.secondary }}
                     />
                     <div
-                      className="w-8 h-8 rounded-full shadow-sm border"
+                      className={cn(
+                        isMobile ? "w-4 h-4" : "w-8 h-8",
+                        "rounded-full shadow-sm border"
+                      )}
                       style={{ backgroundColor: palette.background }}
                     />
                   </div>
@@ -210,14 +226,12 @@ export function StyleLibrary({
                     <h4 className="font-medium text-gray-900">
                       {palette.name}
                     </h4>
-                    <p className="text-xs text-gray-500">
-                      {palette.primary} • {palette.secondary}
-                    </p>
+                    {!isMobile && (
+                      <p className="text-xs text-gray-500">
+                        {palette.primary} • {palette.secondary}
+                      </p>
+                    )}
                   </div>
-
-                  <Button size="sm" variant="ghost">
-                    Apply
-                  </Button>
                 </div>
               </CardContent>
             </Card>

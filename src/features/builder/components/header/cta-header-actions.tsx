@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useBuilderStore } from "@/stores/use-builder-store";
-import { DownloadIcon, EyeIcon, UploadIcon } from "lucide-react";
+import { DownloadIcon, EditIcon, EyeIcon, UploadIcon } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
 export const CTAHeaderActions = () => {
@@ -14,6 +15,7 @@ export const CTAHeaderActions = () => {
     exportConfig,
     sections,
   } = useBuilderStore();
+  const isMobile = useIsMobile();
 
   const handleImport = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,14 +53,18 @@ export const CTAHeaderActions = () => {
     <div className="flex items-center gap-3">
       {sections.length > 0 && (
         <Button variant={"outline"} onClick={() => togglePreviewMode()}>
-          <EyeIcon className="w-4 h-4" />
-          {previewMode ? "Edit" : "Preview"}
+          {previewMode ? (
+            <EditIcon className="w-4 h-4" />
+          ) : (
+            <EyeIcon className="w-4 h-4" />
+          )}
+          {!isMobile ? (previewMode ? "Edit" : "Preview") : ""}
         </Button>
       )}
 
       <Button variant={"outline"} onClick={handleExport}>
         <DownloadIcon className="w-4 h-4" />
-        Export
+        {!isMobile && "Export"}
       </Button>
 
       <input
@@ -70,7 +76,7 @@ export const CTAHeaderActions = () => {
       />
       <Button variant={"outline"} onClick={() => fileInputRef.current?.click()}>
         <UploadIcon className="w-4 h-4" />
-        Import
+        {!isMobile && "Import"}
       </Button>
     </div>
   );

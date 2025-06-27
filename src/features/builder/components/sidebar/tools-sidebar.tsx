@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sectionTemplates, templates } from "@/constant";
+import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/stores/use-builder-store";
 import { AnimatePresence, motion } from "framer-motion";
 import { SearchIcon } from "lucide-react";
@@ -25,9 +26,13 @@ const properties = ["Sections", "Templates", "Styles"];
 
 interface ToolsSidebarProps {
   onAddSection: (sectionType: string) => void;
+  insideSheet?: boolean;
 }
 
-export const ToolsSidebar = ({ onAddSection }: ToolsSidebarProps) => {
+export const ToolsSidebar = ({
+  onAddSection,
+  insideSheet = false,
+}: ToolsSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activePanel, setActivePanel] = useState<
     "Sections" | "Templates" | "Styles"
@@ -124,7 +129,13 @@ export const ToolsSidebar = ({ onAddSection }: ToolsSidebarProps) => {
   };
 
   return (
-    <aside className="w-[400px] fixed inset-0 h-screen backdrop-blur-sm p-4 mt-14 bg-background border-r">
+    <aside
+      className={cn(
+        insideSheet
+          ? "mt-8 p-3"
+          : "md:w-[400px] w-[200px] fixed inset-0 h-screen backdrop-blur-sm p-4 mt-14 bg-background border-r"
+      )}
+    >
       <div className="flex gap-y-4 flex-col">
         {/* Property selector */}
         <Select
@@ -163,7 +174,12 @@ export const ToolsSidebar = ({ onAddSection }: ToolsSidebarProps) => {
         )}
       </div>
 
-      <ScrollArea className="flex-1 mt-4 overflow-y-auto h-[502px]">
+      <ScrollArea
+        className={cn(
+          insideSheet ? "h-[680px]" : "h-[502px]",
+          "flex-1 mt-4 overflow-y-auto"
+        )}
+      >
         <AnimatePresence mode="wait">{renderSidebar()}</AnimatePresence>
       </ScrollArea>
     </aside>

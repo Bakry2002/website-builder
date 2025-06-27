@@ -1,6 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useBuilderStore } from "@/stores/use-builder-store";
 import { useCallback, useEffect, useState } from "react";
 import { PreviewCanvas } from "./preview-canvas";
@@ -21,6 +22,7 @@ const BuilderManager = () => {
   const sections = useBuilderStore(useCallback((state) => state.sections, []));
   const selectedSection = sections.find((s) => s.id === selectedSectionId);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Wait for store to hydrate from localStorage
@@ -60,10 +62,10 @@ const BuilderManager = () => {
 
   return (
     <div className="flex items-center gap-4">
-      <ToolsSidebar onAddSection={addSection} />
+      {!isMobile && <ToolsSidebar onAddSection={addSection} />}
 
       {/* Canvas Area */}
-      <div className="flex-1 ml-[400px] h-[calc(100vh-3.5rem)] mt-14 flex overflow-hidden">
+      <div className="flex-1 md:ml-[400px] h-[calc(100vh-3.5rem)] mt-14 flex overflow-hidden">
         <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-50 to-gray-100">
           <PreviewCanvas
             sections={sections}
@@ -77,7 +79,7 @@ const BuilderManager = () => {
           />
         </div>
 
-        {selectedSection && !previewMode && !showPropertyPanel ? (
+        {!isMobile && selectedSection && !previewMode && !showPropertyPanel ? (
           <div className="w-80 bg-white/80 backdrop-blur-sm border-l border-gray-200 overflow-auto">
             <PropertiesPanel
               section={selectedSection}

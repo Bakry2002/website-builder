@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Layout } from "lucide-react";
 import { SectionTemplate } from "../../types";
 
@@ -11,6 +12,8 @@ export function SectionLibrary({
   onAddSection,
   filteredSections,
 }: SectionLibraryProps) {
+  const isMobile = useIsMobile();
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-auto p-2 pr-6">
@@ -23,9 +26,11 @@ export function SectionLibrary({
             >
               <CardContent className="p-3">
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg flex items-center justify-center text-white">
-                    <section.icon className="w-5 h-5" />
-                  </div>
+                  {!isMobile && (
+                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg flex items-center justify-center text-white">
+                      <section.icon className="w-5 h-5" />
+                    </div>
+                  )}
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">

@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useBuilderStore } from "@/stores/use-builder-store";
 import {
@@ -46,6 +47,7 @@ export function PreviewCanvas({
 }: PreviewCanvasProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const { deviceScreen, moveSection } = useBuilderStore();
+  const isMobile = useIsMobile();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -128,7 +130,12 @@ export function PreviewCanvas({
   }
 
   return (
-    <div className="p-4 min-h-screen flex justify-center items-start">
+    <div
+      className={cn(
+        isMobile ? "p-0" : "p-4",
+        "min-h-screen flex justify-center items-start"
+      )}
+    >
       <div
         className={cn(
           deviceStyles[deviceScreen],
