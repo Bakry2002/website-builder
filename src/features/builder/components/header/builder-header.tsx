@@ -16,23 +16,22 @@ export const BuilderHeader = () => {
   return (
     <header className="h-14 fixed z-50 inset-0 w-full flex items-center bg-background border-b">
       <div className="container mx-auto px-8">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4">
           {/* LOGO */}
-          <div>LOGO</div>
+          <div className="flex-1">LOGO</div>
 
           {/* Device switcher */}
           <DeviceSwitcher />
-
-          {/* CTA header actions */}
-          <CTAHeaderActions />
-
-          {selectedSectionId && !previewMode && (
-            <Button onClick={togglePropertyPanel} variant="outline">
-              <ListCollapseIcon />
-            </Button>
-          )}
-
-          <SavingIndicator />
+          <div className="flex flex-1 justify-between items-center gap-4">
+            <SavingIndicator />
+            {/* CTA header actions */}
+            <CTAHeaderActions />
+            {selectedSectionId && !previewMode && (
+              <Button onClick={togglePropertyPanel} variant="outline">
+                <ListCollapseIcon />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>

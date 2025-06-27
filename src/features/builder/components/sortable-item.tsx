@@ -47,7 +47,7 @@ export function SortableItem({
             : "border-2 rounded-xl overflow-hidden transition-all duration-300"
         } ${
           selectedSectionId === section.id && !previewMode
-            ? "border-purple-500 shadow-xl shadow-purple-100 ring-4 ring-purple-100"
+            ? "border-blue-500 shadow-md shadow-blue-100 ring-4 ring-blue-100"
             : previewMode
             ? ""
             : "border-gray-200 hover:border-gray-300 hover:shadow-lg"
@@ -55,7 +55,7 @@ export function SortableItem({
         onClick={() => !previewMode && onSelectSection(section.id)}
       >
         {!previewMode && (
-          <div className="absolute top-3 right-3 z-10 flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <div className="absolute top-3 right-3 z-[60] flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
             <div
               {...attributes}
               {...listeners}
@@ -77,7 +77,7 @@ export function SortableItem({
           </div>
         )}
         {!previewMode && selectedSectionId === section.id && (
-          <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-lg">
+          <div className="absolute z-[60] top-3 left-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-lg">
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
               <span>{section.title}</span>

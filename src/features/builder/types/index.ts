@@ -54,3 +54,14 @@ export interface DragEvent {
     id: string;
   } | null;
 }
+
+export interface Template {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  preview: string;
+  sections: Section[];
+  globalStyles: GlobalStyles;
+  featured?: boolean;
+}

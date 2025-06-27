@@ -3,6 +3,7 @@ import {
   GlobalStyles,
   HistoryState,
   Section,
+  Template,
 } from "@/features/builder/types";
 import { getDefaultContent, readFileAsText } from "@/features/builder/utils";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -11,6 +12,7 @@ import { persist } from "zustand/middleware";
 
 type BuilderStore = BuilderState & {
   isAutoSaving: boolean;
+  autoSaveTimer: NodeJS.Timeout | null;
   deviceScreen: "mobile" | "tablet" | "monitor";
   // Actions
   addSection: (sectionType: string) => void;
@@ -31,6 +33,7 @@ type BuilderStore = BuilderState & {
   resetImportInput: () => void;
   togglePropertyPanel: () => void;
   setDeviceScreen: (screen: "mobile" | "tablet" | "monitor") => void;
+  loadTemplate: (template: Template) => void;
 };
 
 const initialState: BuilderState = {
@@ -53,6 +56,8 @@ export const useBuilderStore = create<BuilderStore>()(
     (set, get) => ({
       ...initialState,
       isAutoSaving: false,
+      autoSaveTimer: null,
+
       deviceScreen: "monitor",
 
       addSection: (sectionType) => {
@@ -162,31 +167,53 @@ export const useBuilderStore = create<BuilderStore>()(
       },
 
       autoSave: () => {
-        // Set isAutoSaving to true immediately
-        set({ isAutoSaving: true });
+        const { autoSaveTimer } = get();
 
-        const { sections, globalStyles } = get();
-        const config = {
-          version: "2.0",
-          timestamp: new Date().toISOString(),
-          sections,
-          globalStyles,
-        };
+        // Clear existing timer if it exists
+        if (autoSaveTimer) {
+          clearTimeout(autoSaveTimer);
+        }
 
-        try {
-          localStorage.setItem(
-            "website-builder-autosave",
-            JSON.stringify(config)
-          );
+        // Set new timer
+        const newTimer = setTimeout(() => {
+          // Set isAutoSaving to true when actually saving
+          set({ isAutoSaving: true });
 
-          // Hide the saving indicator after 0.5 second
-          setTimeout(() => {
+          const { sections, globalStyles } = get();
+          const config = {
+            version: "2.0",
+            timestamp: new Date().toISOString(),
+            sections,
+            globalStyles,
+          };
+
+          try {
+            localStorage.setItem(
+              "website-builder-autosave",
+              JSON.stringify(config)
+            );
+
+            // Hide the saving indicator after 0.5 second
+            setTimeout(() => {
+              set({ isAutoSaving: false });
+            }, 500);
+          } catch (error) {
+            console.error("Auto-save failed:", error);
+            // Hide the indicator immediately if save fails
             set({ isAutoSaving: false });
-          }, 500);
-        } catch (error) {
-          console.error("Auto-save failed:", error);
-          // Hide the indicator immediately if save fails
-          set({ isAutoSaving: false });
+          }
+        }, 500); // 500ms debounce delay
+
+        // Store the new timer
+        set({ autoSaveTimer: newTimer });
+      },
+
+      // Clean up timer when store is destroyed
+      cleanup: () => {
+        const { autoSaveTimer } = get();
+        if (autoSaveTimer) {
+          clearTimeout(autoSaveTimer);
+          set({ autoSaveTimer: null });
         }
       },
 
@@ -287,6 +314,50 @@ export const useBuilderStore = create<BuilderStore>()(
         set({ showPropertyPanel: !get().showPropertyPanel }),
 
       setDeviceScreen: (screen) => set({ deviceScreen: screen }),
+
+      loadTemplate: (template) => {
+        try {
+          if (
+            !template ||
+            !template.sections ||
+            !Array.isArray(template.sections)
+          ) {
+            throw new Error("Invalid template format: missing sections array");
+          }
+
+          const isValid = template.sections.every(
+            (section: Section) => section.id && section.type && section.content
+          );
+
+          if (!isValid) {
+            throw new Error("Invalid section format in template");
+          }
+
+          const newSections = template.sections.map(
+            (section: Section, index: number) => ({
+              ...section,
+              id: `section-${Date.now()}-${Math.random()
+                .toString(36)
+                .substr(2, 9)}-${index}`,
+              order: index,
+            })
+          );
+
+          set({
+            sections: newSections,
+            globalStyles: template.globalStyles || get().globalStyles,
+            selectedSectionId: null,
+          });
+
+          get().saveToHistory();
+          get().autoSave();
+
+          console.log("Template loaded successfully");
+        } catch (error) {
+          console.error("Failed to load template:", error);
+          throw error;
+        }
+      },
     }),
     {
       name: "builder-store", // name for the localStorage key

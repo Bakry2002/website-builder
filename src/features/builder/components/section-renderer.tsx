@@ -83,7 +83,7 @@ export function SectionRenderer({
   return (
     <div
       className={cn(
-        !previewMode && isSelected ? "ring-2 ring-purple-500" : "",
+        !previewMode && isSelected ? "ring-2 ring-blue-500" : "",
         "transition-all duration-200 w-full p-2"
       )}
       style={sectionStyle}
@@ -174,7 +174,7 @@ function HeroSection({
           {buttonText}
         </Button>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-500/20"></div>
     </div>
   );
 }
