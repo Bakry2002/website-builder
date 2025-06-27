@@ -8,7 +8,7 @@ import {
 import { getDefaultContent, readFileAsText } from "@/features/builder/utils";
 import { arrayMove } from "@dnd-kit/sortable";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type BuilderStore = BuilderState & {
   isAutoSaving: boolean;
@@ -21,11 +21,7 @@ type BuilderStore = BuilderState & {
   setSelectedSectionId: (id: string | null) => void;
   togglePreviewMode: () => void;
   updateGlobalStyles: (styles: Partial<GlobalStyles>) => void;
-  // History actions
   saveToHistory: () => void;
-  undo: () => void;
-  redo: () => void;
-  // Auto-save
   autoSave: () => void;
   moveSection: (activeId: string, overId: string) => void;
   exportConfig: () => void;
@@ -57,7 +53,6 @@ export const useBuilderStore = create<BuilderStore>()(
       ...initialState,
       isAutoSaving: false,
       autoSaveTimer: null,
-
       deviceScreen: "monitor",
 
       addSection: (sectionType) => {
@@ -360,13 +355,28 @@ export const useBuilderStore = create<BuilderStore>()(
       },
     }),
     {
-      name: "builder-store", // name for the localStorage key
+      name: "builder-store",
+      storage: createJSONStorage(() => {
+        // Return a safe storage that works on both server and client
+        if (typeof window === "undefined") {
+          // Server-side: return a no-op storage
+          return {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          };
+        }
+        // Client-side: return localStorage
+        return localStorage;
+      }),
       partialize: (state) =>
         Object.fromEntries(
           Object.entries(state).filter(
-            ([key]) => !["history", "historyIndex"].includes(key)
+            ([key]) =>
+              !["history", "historyIndex", "autoSaveTimer"].includes(key)
           )
-        ) as BuilderState, // Only persist non-history state
+        ) as BuilderState,
+      skipHydration: typeof window === "undefined",
     }
   )
 );

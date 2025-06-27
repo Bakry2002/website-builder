@@ -2,13 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { useBuilderStore } from "@/stores/use-builder-store";
-import { EyeIcon, ImportIcon } from "lucide-react";
+import { DownloadIcon, EyeIcon, UploadIcon } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
 export const CTAHeaderActions = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { previewMode, togglePreviewMode, importConfig, exportConfig } =
-    useBuilderStore();
+  const {
+    previewMode,
+    togglePreviewMode,
+    importConfig,
+    exportConfig,
+    sections,
+  } = useBuilderStore();
 
   const handleImport = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +46,18 @@ export const CTAHeaderActions = () => {
       console.log("error while exporting design", error);
     }
   }, [exportConfig]);
+
   return (
     <div className="flex items-center gap-3">
-      <Button variant={"outline"} onClick={() => togglePreviewMode()}>
-        <EyeIcon className="w-4 h-4" />
-        {previewMode ? "Edit" : "Preview"}
-      </Button>
+      {sections.length > 0 && (
+        <Button variant={"outline"} onClick={() => togglePreviewMode()}>
+          <EyeIcon className="w-4 h-4" />
+          {previewMode ? "Edit" : "Preview"}
+        </Button>
+      )}
 
-      {}
       <Button variant={"outline"} onClick={handleExport}>
-        <EyeIcon className="w-4 h-4" />
+        <DownloadIcon className="w-4 h-4" />
         Export
       </Button>
 
@@ -62,7 +69,7 @@ export const CTAHeaderActions = () => {
         onChange={handleImport}
       />
       <Button variant={"outline"} onClick={() => fileInputRef.current?.click()}>
-        <ImportIcon className="w-4 h-4" />
+        <UploadIcon className="w-4 h-4" />
         Import
       </Button>
     </div>

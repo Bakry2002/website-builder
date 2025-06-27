@@ -84,9 +84,13 @@ export function SectionRenderer({
     <div
       className={cn(
         !previewMode && isSelected ? "ring-2 ring-blue-500" : "",
-        "transition-all duration-200 w-full p-2"
+        "transition-all duration-200 w-full",
+        deviceScreen === "monitor" && "p-2"
       )}
-      style={sectionStyle}
+      style={{
+        ...sectionStyle,
+        padding: deviceScreen === "monitor" ? section.styles?.padding : "0px",
+      }}
     >
       {renderSection()}
     </div>
@@ -238,6 +242,10 @@ function HeaderSection({
                   key={index}
                   href="#"
                   className="text-gray-600 hover:text-gray-900 transition-colors border-b-transparent hover:border-b-blue-600 border-b-2 font-medium relative group text-base"
+                  style={{
+                    color:
+                      section.styles?.textColor ?? globalStyles.primaryColor,
+                  }}
                 >
                   {item}
                 </a>
@@ -263,7 +271,6 @@ function HeaderSection({
                       key={index}
                       href="#"
                       className="text-gray-600 border-b-transparent hover:border-b-blue-600 border-b-2 hover:text-gray-900 transition-colors w-fit text-sm font-medium"
-                      style={{ color: globalStyles.primaryColor }}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item}
@@ -291,7 +298,13 @@ function FooterSection({
   const { copyright, links } = section.content;
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer
+      className="bg-gray-900"
+      style={{
+        color: section.styles?.textColor ?? globalStyles.primaryColor,
+        backgroundColor: section.styles?.backgroundColor ?? "#1F2937",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div
           className={
@@ -300,19 +313,25 @@ function FooterSection({
               : "flex flex-col items-center space-y-6"
           }
         >
-          <p className="text-gray-400 text-sm text-center">{copyright}</p>
+          <p
+            className="text-gray-400 text-sm text-center"
+            style={{
+              color: section.styles?.textColor ?? globalStyles.primaryColor,
+            }}
+          >
+            {copyright}
+          </p>
           <div className="flex flex-wrap justify-center gap-4">
             {links.map((link: string, index: number) => (
               <a
                 key={index}
                 href="#"
                 className="text-gray-400 hover:text-white transition-colors relative group text-sm"
+                style={{
+                  color: section.styles?.textColor ?? globalStyles.primaryColor,
+                }}
               >
                 {link}
-                <span
-                  className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
-                  style={{ backgroundColor: globalStyles.primaryColor }}
-                ></span>
               </a>
             ))}
           </div>
@@ -342,16 +361,31 @@ function ContentSection({
   const { titleSize, textSize, padding } = contentStyles[deviceScreen];
 
   return (
-    <div className={`bg-white ${padding}`}>
+    <div
+      className={`bg-white ${padding}`}
+      style={{
+        backgroundColor: section.styles?.backgroundColor,
+        color: section.styles?.textColor ?? globalStyles.primaryColor,
+      }}
+    >
       <div className="max-w-4xl mx-auto px-4">
         <h2
           className={`${titleSize} font-bold mb-6 text-center`}
-          style={{ color: globalStyles.primaryColor }}
+          style={{
+            color: section.styles?.textColor ?? globalStyles.primaryColor,
+          }}
         >
           {title}
         </h2>
         <div className="prose max-w-none text-gray-600 text-center leading-relaxed">
-          <p className={textSize}>{text}</p>
+          <p
+            className={textSize}
+            style={{
+              color: section.styles?.textColor ?? globalStyles.secondaryColor,
+            }}
+          >
+            {text}
+          </p>
         </div>
       </div>
     </div>
@@ -393,11 +427,19 @@ function GallerySection({
   const { gridCols, gap, titleSize, padding } = galleryStyles[deviceScreen];
 
   return (
-    <div className={`bg-gray-50 ${padding}`}>
+    <div
+      className={`bg-gray-50 ${padding}`}
+      style={{
+        backgroundColor: section.styles?.backgroundColor,
+        color: section.styles?.textColor ?? globalStyles.primaryColor,
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4">
         <h2
           className={`${titleSize} font-bold mb-8 text-center`}
-          style={{ color: globalStyles.primaryColor }}
+          style={{
+            color: section.styles?.textColor ?? globalStyles.primaryColor,
+          }}
         >
           {title}
         </h2>

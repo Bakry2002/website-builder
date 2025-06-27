@@ -86,9 +86,9 @@ export function PreviewCanvas({
 
   const deviceFrameStyles = {
     tablet:
-      "p-1 overflow-hidden bg-gray-100 rounded-[2.5rem] shadow-xl border-8 border-gray-800",
+      "overflow-hidden bg-gray-100 rounded-[2.5rem] shadow-xl border-8 border-gray-800",
     mobile:
-      "p-1 overflow-hidden bg-gray-100 rounded-[2rem] shadow-xl border-6 border-gray-800",
+      "overflow-hidden bg-gray-100 rounded-[2rem] shadow-xl border-6 border-gray-800",
     monitor: "",
   };
 
@@ -96,7 +96,7 @@ export function PreviewCanvas({
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center p-4">
-          <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+          <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Sparkles className="w-12 h-12 text-blue-500" />
           </div>
           <h3 className="text-xl font-bold text-gray-700 mb-4">

@@ -1,8 +1,8 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { useBuilderStore } from "@/stores/use-builder-store";
-import { useCallback, useState } from "react";
-import { BuilderState, HistoryState } from "../types";
+import { useCallback, useEffect, useState } from "react";
 import { PreviewCanvas } from "./preview-canvas";
 import { PropertiesPanel } from "./properties-panel";
 import { ToolsSidebar } from "./sidebar/tools-sidebar";
@@ -19,44 +19,44 @@ const BuilderManager = () => {
     showPropertyPanel,
   } = useBuilderStore();
   const sections = useBuilderStore(useCallback((state) => state.sections, []));
-
-  const [history, setHistory] = useState<HistoryState[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
-
-  // Save to history for undo/redo
-  const saveToHistory = useCallback(
-    (newState: BuilderState) => {
-      const historyEntry: HistoryState = {
-        sections: newState.sections,
-        globalStyles: newState.globalStyles,
-        timestamp: Date.now(),
-      };
-
-      setHistory((prev) => {
-        const newHistory = prev.slice(0, historyIndex + 1);
-        newHistory.push(historyEntry);
-        return newHistory.slice(-50);
-      });
-      setHistoryIndex((prev) => Math.min(prev + 1, 49));
-    },
-    [historyIndex]
-  );
-
-  // Auto-save functionality
-  const autoSave = useCallback(() => {
-    setIsAutoSaving(true);
-    const config = {
-      version: "2.0",
-      timestamp: new Date().toISOString(),
-      sections: sections,
-      globalStyles: globalStyles,
-    };
-    localStorage.setItem("website-builder-autosave", JSON.stringify(config));
-    setTimeout(() => setIsAutoSaving(false), 1000);
-  }, [sections, globalStyles]);
-
   const selectedSection = sections.find((s) => s.id === selectedSectionId);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Wait for store to hydrate from localStorage
+    const unsubscribe = useBuilderStore.persist.onFinishHydration(() => {
+      setIsLoaded(true);
+    });
+
+    // If already hydrated, set loaded immediately
+    if (useBuilderStore.persist.hasHydrated()) {
+      setIsLoaded(true);
+    }
+
+    return unsubscribe;
+  }, []);
+
+  if (!isLoaded) {
+    return (
+      <div className="h-screen flex">
+        <div className="w-80 border-r bg-gray-50 p-4">
+          <Skeleton className="h-8 w-32 mb-4" />
+          <div className="space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        </div>
+        <div className="flex-1 p-4">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-4">
@@ -77,7 +77,6 @@ const BuilderManager = () => {
           />
         </div>
 
-        {/* Enhanced Properties Panel */}
         {selectedSection && !previewMode && !showPropertyPanel ? (
           <div className="w-80 bg-white/80 backdrop-blur-sm border-l border-gray-200 overflow-auto">
             <PropertiesPanel
