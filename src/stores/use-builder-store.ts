@@ -1,7 +1,6 @@
 import {
   BuilderState,
   GlobalStyles,
-  HistoryState,
   Section,
   Template,
 } from "@/features/builder/types";
@@ -21,7 +20,6 @@ type BuilderStore = BuilderState & {
   setSelectedSectionId: (id: string | null) => void;
   togglePreviewMode: () => void;
   updateGlobalStyles: (styles: Partial<GlobalStyles>) => void;
-  saveToHistory: () => void;
   autoSave: () => void;
   moveSection: (activeId: string, overId: string) => void;
   exportConfig: () => void;
@@ -42,8 +40,6 @@ const initialState: BuilderState = {
     fontFamily: "Inter",
     backgroundColor: "#FFFFFF",
   },
-  history: [],
-  historyIndex: -1,
   showPropertyPanel: true,
 };
 
@@ -79,7 +75,6 @@ export const useBuilderStore = create<BuilderStore>()(
           selectedSectionId: newSection.id,
         }));
 
-        get().saveToHistory();
         get().autoSave();
       },
 
@@ -89,7 +84,7 @@ export const useBuilderStore = create<BuilderStore>()(
             section.id === sectionId ? { ...section, ...updates } : section
           ),
         }));
-        get().saveToHistory();
+
         get().autoSave();
       },
 
@@ -103,7 +98,7 @@ export const useBuilderStore = create<BuilderStore>()(
               ? null
               : state.selectedSectionId,
         }));
-        get().saveToHistory();
+
         get().autoSave();
       },
 
@@ -119,46 +114,8 @@ export const useBuilderStore = create<BuilderStore>()(
         set((state) => ({
           globalStyles: { ...state.globalStyles, ...styles },
         }));
-        get().saveToHistory();
+
         get().autoSave();
-      },
-
-      saveToHistory: () => {
-        const { sections, globalStyles, history, historyIndex } = get();
-        const historyEntry: HistoryState = {
-          sections,
-          globalStyles,
-          timestamp: Date.now(),
-        };
-
-        set({
-          history: [...history.slice(0, historyIndex + 1), historyEntry].slice(
-            -50
-          ),
-          historyIndex: Math.min(historyIndex + 1, 49),
-        });
-      },
-
-      undo: () => {
-        const { history, historyIndex } = get();
-        if (historyIndex <= 0) return;
-
-        const previousState = history[historyIndex - 1];
-        set({
-          ...previousState,
-          historyIndex: historyIndex - 1,
-        });
-      },
-
-      redo: () => {
-        const { history, historyIndex } = get();
-        if (historyIndex >= history.length - 1) return;
-
-        const nextState = history[historyIndex + 1];
-        set({
-          ...nextState,
-          historyIndex: historyIndex + 1,
-        });
       },
 
       autoSave: () => {
@@ -227,7 +184,7 @@ export const useBuilderStore = create<BuilderStore>()(
         );
 
         set({ sections: newSections });
-        get().saveToHistory();
+
         get().autoSave();
       },
 
@@ -292,7 +249,6 @@ export const useBuilderStore = create<BuilderStore>()(
             selectedSectionId: null,
           });
 
-          get().saveToHistory();
           return true; // Success
         } catch (error) {
           console.error("Import failed:", error);
@@ -344,7 +300,6 @@ export const useBuilderStore = create<BuilderStore>()(
             selectedSectionId: null,
           });
 
-          get().saveToHistory();
           get().autoSave();
 
           console.log("Template loaded successfully");
@@ -372,8 +327,7 @@ export const useBuilderStore = create<BuilderStore>()(
       partialize: (state) =>
         Object.fromEntries(
           Object.entries(state).filter(
-            ([key]) =>
-              !["history", "historyIndex", "autoSaveTimer"].includes(key)
+            ([key]) => !["autoSaveTimer"].includes(key)
           )
         ) as BuilderState,
       skipHydration: typeof window === "undefined",

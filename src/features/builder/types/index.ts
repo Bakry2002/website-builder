@@ -18,8 +18,6 @@ export interface BuilderState {
   selectedSectionId: string | null;
   previewMode: boolean;
   globalStyles: GlobalStyles;
-  history: HistoryState[];
-  historyIndex: number;
   showPropertyPanel: boolean;
 }
 
