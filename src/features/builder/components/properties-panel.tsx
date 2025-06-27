@@ -321,7 +321,7 @@ export function PropertiesPanel({
     <TooltipProvider delayDuration={100}>
       <div className="h-full flex flex-col bg-gradient-to-b from-gray-50 to-white">
         <div className="p-6 bg-white border-b border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 md:mt-0 mt-5">
             <h3 className="text-lg font-semibold text-primary flex items-center">
               <Settings className="w-5 h-5 mr-2 text-blue-600" />
               Properties
